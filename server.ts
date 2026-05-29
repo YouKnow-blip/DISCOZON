@@ -72,8 +72,14 @@ interface DataBase {
 }
 
 // Global server variables
-const DATA_FILE = path.join(process.cwd(), "data_store.json");
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+const isVercel = !!process.env.VERCEL;
+const DATA_FILE = isVercel
+  ? path.join("/tmp", "data_store.json")
+  : path.join(process.cwd(), "data_store.json");
+
+const UPLOAD_DIR = isVercel
+  ? path.join("/tmp", "uploads")
+  : path.join(process.cwd(), "uploads");
 
 // Initialize uploads directory
 try {
@@ -81,7 +87,7 @@ try {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   }
 } catch (err) {
-  console.warn("Failed to create uploads directory (expected in serverless or read-only workspaces):", err);
+  console.warn("Failed to create uploads directory:", err);
 }
 
 // Set up Gemini SDK
@@ -112,6 +118,18 @@ const DEFAULT_AVATARS = [
 ];
 
 const loadDb = (): DataBase => {
+  if (isVercel && !fs.existsSync(DATA_FILE)) {
+    const origPath = path.join(process.cwd(), "data_store.json");
+    if (fs.existsSync(origPath)) {
+      try {
+        fs.copyFileSync(origPath, DATA_FILE);
+        console.log("Seeded /tmp/data_store.json from read-only data_store.json at deployment root.");
+      } catch (err) {
+        console.error("Could not copy base database to /tmp:", err);
+      }
+    }
+  }
+
   if (fs.existsSync(DATA_FILE)) {
     try {
       const content = fs.readFileSync(DATA_FILE, "utf-8");
