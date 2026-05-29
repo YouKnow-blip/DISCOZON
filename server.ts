@@ -1160,6 +1160,11 @@ setInterval(() => {
 // ==========================================
 
 async function startServer() {
+  if (process.env.VERCEL) {
+    log("Serverless Vercel environment detected. Bypassing HTTP port listener.");
+    return;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     log("Mounting Vite developer middleware...");
     const vite = await createViteServer({
@@ -1186,3 +1191,5 @@ async function startServer() {
 }
 
 startServer();
+
+export default app;
