@@ -1,0 +1,11 @@
+{
+  "name": "DISCOZON",
+  "description": "Современная real-time голосовая и текстовая чат-платформа уровня Discord на русском языке.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

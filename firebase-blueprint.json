@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with status and custom text",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the user"
+        },
+        "username": {
+          "type": "string",
+          "description": "Unique username"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Display name of the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "Avatar image URL"
+        },
+        "banner": {
+          "type": "string",
+          "description": "Profile hex color code"
+        },
+        "status": {
+          "type": "string",
+          "description": "Online presence status"
+        },
+        "customStatusText": {
+          "type": "string",
+          "description": "Custom status message text"
+        },
+        "tag": {
+          "type": "string",
+          "description": "4-digit Discord-style tag"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of registration"
+        }
+      },
+      "required": ["id", "username", "tag"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Chat log message document",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Message ID"
+        },
+        "channelId": {
+          "type": "string",
+          "description": "Originating channel ID"
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Sender User ID"
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Sender nickname"
+        },
+        "content": {
+          "type": "string",
+          "description": "The message body content"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        }
+      },
+      "required": ["id", "channelId", "senderId", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profiles"
+    },
+    "/channels/{channelId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Stores channel chat log messages"
+    }
+  }
+}

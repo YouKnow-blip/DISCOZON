@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Security Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reuseable Validation Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 1. User Entity match block
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['nickname', 'avatar', 'banner', 'description', 'status', 'customStatusText'])
+      );
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.id is string && data.id.size() <= 128
+          && data.username is string && data.username.size() >= 2 && data.username.size() <= 40
+          && data.nickname is string && data.nickname.size() <= 60
+          && (!('email' in data) || (data.email is string && data.email.size() <= 100))
+          && (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 1000))
+          && (!('banner' in data) || (data.banner is string && data.banner.size() <= 30))
+          && (!('status' in data) || (data.status is string && data.status.size() <= 20))
+          && (!('customStatusText' in data) || (data.customStatusText is string && data.customStatusText.size() <= 150))
+          && data.tag is string && data.tag.size() == 4;
+    }
+
+    // 2. Channel Messages nested path variables
+    match /channels/{channelId}/messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidMessage(incoming()) && incoming().senderId == request.auth.uid;
+      allow update: if isSignedIn() && existing().senderId == request.auth.uid && isValidMessage(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['content', 'editedAt'])
+      );
+      allow delete: if isSignedIn() && existing().senderId == request.auth.uid;
+    }
+
+    function isValidMessage(data) {
+      return data.id is string && data.id.size() <= 128
+          && data.channelId is string && data.channelId.size() <= 128
+          && data.senderId is string && data.senderId.size() <= 128
+          && data.senderName is string && data.senderName.size() <= 100
+          && data.content is string && data.content.size() <= 2000;
+    }
+  }
+}

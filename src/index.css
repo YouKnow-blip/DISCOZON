@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Color overrides for matching the requested Bento Grid design */
+:root {
+  --bento-outer: #0E0F11;
+  --bento-left-rail: #08090A;
+  --bento-sidebar: #111317;
+  --bento-main-bg: #14161A;
+  --bento-user-bar: #0A0B0D;
+  --bento-border: #1F2229;
+  --bento-active-channel: #262A33;
+  --bento-hover: #1B1D22;
+  --bento-card: #0B0C0E;
+  --bento-text-primary: #E0E0E0;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bento-outer);
+  color: var(--bento-text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Let's remap ALL hardcoded hex color classes beautifully so that we don't leave any gaps */
+.bg-\[\#1e1f22\] {
+  background-color: var(--bento-outer) !important;
+}
+.bg-\[\#313338\] {
+  background-color: var(--bento-main-bg) !important;
+}
+.bg-\[\#2b2d31\] {
+  background-color: var(--bento-sidebar) !important;
+}
+.bg-\[\#111214\] {
+  background-color: var(--bento-left-rail) !important;
+}
+.bg-\[\#232428\] {
+  background-color: var(--bento-user-bar) !important;
+}
+.bg-\[\#35373c\] {
+  background-color: var(--bento-active-channel) !important;
+}
+.bg-\[\#1f2229\] {
+  background-color: var(--bento-border) !important;
+}
+.bg-\[\#1b1d22\] {
+  background-color: var(--bento-hover) !important;
+}
+.bg-\[\#262a33\] {
+  background-color: var(--bento-active-channel) !important;
+}
+
+/* Interactive elements */
+.hover\:bg-\[\#313338\]:hover {
+  background-color: var(--bento-main-bg) !important;
+}
+.hover\:bg-\[\#35373c\]:hover {
+  background-color: var(--bento-active-channel) !important;
+}
+.hover\:bg-\[\#1b1d22\]:hover {
+  background-color: var(--bento-hover) !important;
+}
+.hover\:bg-\[\#2e3035\]:hover {
+  background-color: var(--bento-hover) !important;
+}
+.hover\:bg-gray-700\/30:hover {
+  background-color: rgba(31, 34, 41, 0.4) !important;
+}
+
+/* Borders mapping to the sleek Bento grid lines */
+.border-\[\#3f4147\] {
+  border-color: var(--bento-border) !important;
+}
+.border-\[\#1f2023\] {
+  border-color: var(--bento-border) !important;
+}
+.border-\[\#1F2229\] {
+  border-color: var(--bento-border) !important;
+}
+.border-r {
+  border-color: var(--bento-border) !important;
+}
+.border-t {
+  border-color: var(--bento-border) !important;
+}
+.border-b {
+  border-color: var(--bento-border) !important;
+}
+.border-l {
+  border-color: var(--bento-border) !important;
+}
+
+/* Custom scrollbars track & thumb for Bento look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bento-left-rail);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bento-border);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bento-active-channel);
+}
+
+/* Helper to hide scrollbar where needed */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
