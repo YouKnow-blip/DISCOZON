@@ -31,10 +31,27 @@ export const AuthScreen: React.FC = () => {
         body: JSON.stringify(body)
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Произошла непредвиденная ошибка');
+        let msg = 'Произошла непредвиденная ошибка';
+        try {
+          const errData = await res.json();
+          msg = errData.error || msg;
+        } catch {
+          try {
+            const rawText = await res.text();
+            if (rawText && rawText.length < 300) {
+              msg = rawText;
+            } else {
+              msg = `Ошибка сервера (Код: ${res.status})`;
+            }
+          } catch {
+            msg = `Ошибка соединения (Статус: ${res.status})`;
+          }
+        }
+        throw new Error(msg);
       }
+
+      const data = await res.json();
 
       // Success
       setToken(data.token);

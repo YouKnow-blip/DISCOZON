@@ -112,9 +112,18 @@ const loadDb = (): DataBase => {
   if (fs.existsSync(DATA_FILE)) {
     try {
       const content = fs.readFileSync(DATA_FILE, "utf-8");
-      return JSON.parse(content);
-    } catch {
-      // JSON syntax error, fallback
+      const parsed = JSON.parse(content);
+      // Validate structure to prevent undefined errors
+      if (parsed && typeof parsed === "object") {
+        if (!parsed.users) parsed.users = {};
+        if (!parsed.passwords) parsed.passwords = {};
+        if (!parsed.servers) parsed.servers = {};
+        if (!parsed.messages) parsed.messages = {};
+        if (!parsed.friends) parsed.friends = [];
+        return parsed as DataBase;
+      }
+    } catch (err) {
+      console.warn("Could not parse data_store.json, creating a fresh seeded seed database database:", err);
     }
   }
 
@@ -250,7 +259,12 @@ const loadDb = (): DataBase => {
 };
 
 const saveDb = (db: DataBase) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf-8");
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf-8");
+  } catch (error) {
+    console.error("[DATABASE SAVE ERROR] Could not save data to data_store.json:", error);
+    // Keep running in memory gracefully so registrations/actions still work
+  }
 };
 
 // Local db inst
