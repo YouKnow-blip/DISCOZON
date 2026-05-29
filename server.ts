@@ -4,7 +4,6 @@ import fs from "fs";
 import http from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 
 // Define Data Store interfaces
 interface StoredUser {
@@ -77,8 +76,12 @@ const DATA_FILE = path.join(process.cwd(), "data_store.json");
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
 // Initialize uploads directory
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn("Failed to create uploads directory (expected in serverless or read-only workspaces):", err);
 }
 
 // Set up Gemini SDK
@@ -727,7 +730,16 @@ app.post("/api/upload", (req, res) => {
 // ==========================================
 
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+let wss: any;
+
+if (process.env.VERCEL) {
+  wss = {
+    on: () => {},
+    clients: new Set(),
+  };
+} else {
+  wss = new WebSocketServer({ server });
+}
 
 // Active ws connections mapped by User ID
 const activeConnections: Record<string, WebSocket> = {};
@@ -1167,6 +1179,7 @@ async function startServer() {
 
   if (process.env.NODE_ENV !== "production") {
     log("Mounting Vite developer middleware...");
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
